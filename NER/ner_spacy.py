@@ -5,64 +5,67 @@ import spacy
 
 DATA_PATH = './data/data_astronomy.json'
 
-# Load json file
+# Veri setini yükle
 with open(DATA_PATH, 'r') as fp:
     data = json.load(fp)
 
-def split_train_test(data):
-    # Convert data to SpaCy format
+def convert_to_spacy_format(data):
+    # Veriyi SpaCy NER formatına çevir
     DATA = []
     for k in data['astronomy']:
-    	ents = data['astronomy'][k]['entities']
-    	for i in range(len(ents)):
-    		DATA.append((k, {'entities': [(
+        ents = data['astronomy'][k]['entities']
+        for i in range(len(ents)):
+            DATA.append((k, {'entities': [(
                 ents[i][0], int(ents[i][1])+1, ents[i][2])]}))
     
-    train, test = DATA[: int(len(DATA)*0.75)], DATA[int(len(DATA)*0.75)+1 :]
-    return train, test
+    return DATA
 
 
 def train_spacy(data, iterations):
-    TRAIN_DATA = data
-    nlp = spacy.blank('tr')  # create blank Language class
-    # create the built-in pipeline components and add them to the pipeline
-    # nlp.create_pipe works for built-ins that are registered with spaCy
+    # Boş Language objesi yarat
+    nlp = spacy.blank('tr')  
+    
+    # NER pipeline'ı oluştur
     if 'ner' not in nlp.pipe_names:
         ner = nlp.create_pipe('ner')
         nlp.add_pipe(ner, last=True)
-       
-
-    # add labels
-    for _, annotations in TRAIN_DATA:
+    
+    # Varlık ismi etiketlerini ekle
+    for _, annotations in data:
          for ent in annotations.get('entities'):
             ner.add_label(ent[2])
-
-    # get names of other pipes to disable them during training
+    
+    # NER haricindeki pipeline'ları dondur
     other_pipes = [pipe for pipe in nlp.pipe_names if pipe != 'ner']
-    with nlp.disable_pipes(*other_pipes):  # only train NER
+    with nlp.disable_pipes(*other_pipes): 
         optimizer = nlp.begin_training()
+
+        # Modeli eğit
         for itn in range(iterations):
             print("Iteration: {}".format(itn))
-            random.shuffle(TRAIN_DATA)
+            random.shuffle(data)
             losses = {}
-            for text, annotations in TRAIN_DATA:
+
+            for text, annotations in data:
                 nlp.update(
-                    [text],  # batch of texts
-                    [annotations],  # batch of annotations
-                    drop=0.2,  # dropout - make it harder to memorise data
-                    sgd=optimizer,  # callable to update weights
+                    [text],  
+                    [annotations],  
+                    drop=0.2, 
+                    sgd=optimizer,
                     losses=losses)
             print(losses)
     return nlp
+    
 
-train, test = split_train_test(data)
-model = train_spacy(train, 10)
+# Modeli eğit
+data = convert_to_spacy_format(data)
+model = train_spacy(data, 10)
 
-# Save the trained model
+# Eğitilmiş modeli kaydet
 model.to_disk("astro-ner")
 
+# Modeli yükle ve test et
 nlp = spacy.load('astro-ner')
-#Test your text
 test_text = input("Enter your testing text: ")
 doc = nlp(test_text)
 
