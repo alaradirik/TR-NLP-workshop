@@ -14,6 +14,8 @@ A small [Turkish news dataset](https://hakan.io/makine-ogrenmesi-turkce-haber-me
 
  ## Notebooks
 Clone the repo and install the requirements before running the notebooks:
-`git clone https://github.com/alaradirik/TR-NLP-workshop.git`
+```
+git clone https://github.com/alaradirik/TR-NLP-workshop.git
 
-`pip install -r requirements.txt`
+pip install -r requirements.txt
+```
