@@ -30,7 +30,7 @@ This repo includes the notebooks and slides for the Turkish Natural Language wor
  } ]
 ```
 
-A small [Turkish news dataset](https://hakan.io/makine-ogrenmesi-turkce-haber-metinleri-veri-seti/) crawled from various news websiteds is used for text clustering. This dataset contains news in 5 categories (economy, arts, politics, sports, technology) with 100 samples per category. 
+A small [Turkish news dataset](https://hakan.io/makine-ogrenmesi-turkce-haber-metinleri-veri-seti/) crawled from various news websites is used for text clustering. This dataset contains news in 5 categories (economy, arts, politics, sports, technology) with 100 samples per category. 
 
  ## Notebooks
 Clone the repo and install the requirements before running the notebooks:
